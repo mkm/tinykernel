@@ -1,0 +1,7 @@
+.gitignore
+: prelude.asm |> nasm -f elf64 -o %o %f |> %B.o
+: foreach kernel/*.d |> ^ dmd %f^ dmd -betterC -preview=in -fPIC -I=kernel -debug -boundscheck=off -O -w -of=%o -c %f |> kernel/%B.o
+# : prelude.o kernel/*.o |> ld -T link.ld -pie -o %o %f |> kernel.bin
+: kernel/*.o |> ld -pie --no-dynamic-linker -o %o %f |> kernel.elf.sym
+: kernel.elf.sym |> cp %f %o; strip %o |> kernel.elf
+: boot.asm | kernel.elf |> nasm -f bin -o %o %f |> %B.bin
